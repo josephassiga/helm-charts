@@ -2,6 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: {{ include "acs-secured-cluster.fullname" . }}-create-cluster-init-bundle
+  namespace: stackrox
   labels:
   {{- include "acs-secured-cluster.labels" . | nindent 4 }}
   annotations:
