@@ -1,1 +1,7 @@
+createClusterInitBundle:
+  createClusterInitBundle:
+    image:
+      repository: image-registry.openshift-image-registry.svc:5000/openshift/cli
+      tag: latest
+    imagePullPolicy: Always
 kubernetesClusterDomain: cluster.local
