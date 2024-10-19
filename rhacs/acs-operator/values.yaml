@@ -1,1 +1,40 @@
-#kubernetesClusterDomain: cluster.local
+# Subchart helper-operator
+# Simply installs the operator
+# Install Operator RHACS
+# Deploys Operator --> Subscription and Operatorgroup
+# Syncwave: 0
+helper-operator:
+  operators:
+    rhacs-operator:
+      enabled: false
+      syncwave: '0'
+      namespace:
+        name: rhacs-operator
+        create: false
+      subscription:
+        channel: stable
+        approval: Manual
+        operatorName: rhacs-operator
+        source: redhat-operators
+        sourceNamespace: openshift-marketplace
+        startingCSV: rhacs-operator.v4.5.3
+      operatorgroup:
+        create: true
+        # rhacs does not support to monitor own namespace,
+        # therefor the spec in the OperatorGroup must be empty
+        notownnamespace: true
+
+# Subchart helper-status-checker
+# checks if ACS operator is ready
+helper-status-checker:
+  enabled: false
+
+  checks:
+
+    - operatorName: rhacs-operator
+      namespace:
+        name: rhacs-operator
+      syncwave: 1
+
+      serviceAccount:
+        name: status-checker-acs
