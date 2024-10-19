@@ -25,7 +25,7 @@ spec:
             - -c
             - |
               #!/usr/bin/env bash
-              set +x
+              #set +x
               export NO_COLOR="True"
               # Wait for central to be ready
               attempt_counter=0
@@ -44,11 +44,11 @@ spec:
               done
               echo "The central is available ..."
 
-              curl -s -k -L -H "Authorization: Bearer $ROX_API_TOKEN" https://$ROX_CENTRAL_ENDPOINT:443/api/cli/download/roxctl-linux -o ./roxctl
+              curl -s -k -L -H "Authorization: Bearer $ROX_API_TOKEN" https://$ROX_CENTRAL_ENDPOINT:443/api/cli/download/roxctl-linux -o /tmp/roxctl
               
-              chmod +x ./roxctl
+              chmod +x /tmp/roxctl
 
-              ./roxctl --insecure-skip-tls-verify central init-bundles generate $ROX_BUNDLE_NAME  --endpoint $ROX_CENTRAL_ENDPOINT:443  --ouput /tmp/"$ROX_BUNDLE_NAME".yaml
+              /tmp/roxctl --insecure-skip-tls-verify central init-bundles generate $ROX_BUNDLE_NAME  --endpoint $ROX_CENTRAL_ENDPOINT:443  --ouput /tmp/"$ROX_BUNDLE_NAME".yaml
               
               if oc get secret/sensor-tls &> /dev/null; then
                 echo "cluster-init bundle has already been configured, doing nothing"
