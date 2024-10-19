@@ -112,20 +112,6 @@ spec:
               fi
           imagePullPolicy: Always
           name: create-cluster-init-bundle
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
       volumes:
         - name: bundle
           emptyDir: {}
