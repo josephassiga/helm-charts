@@ -55,12 +55,12 @@ spec:
                 # Display init bundle generated
                 cat /tmp/"$ROX_BUNDLE_NAME".yaml
 
-                echo "Applying bundle"
+                echo "Applying init bundle generated "
                 # No jq in container, python to the rescue
                 oc apply -f /tmp/"$ROX_BUNDLE_NAME".yaml
 
                 # Touch SecuredCluster to force operator to reconcile
-                oc label SecuredCluster "ROX_BUNDLE_NAME"-secured-cluster cluster-init-job-status=created
+                oc label SecuredCluster "$ROX_BUNDLE_NAME"-secured-cluster cluster-init-job-status=created
 
                 echo "ACS Cluster init bundle generated and applied"
               fi
