@@ -10,9 +10,6 @@ spec:
     spec:
       containers:
         - image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
-          volumeMounts:
-            - mountPath: /data
-              name: bundle
           env:
             - name: ROX_CENTRAL_ENDPOINT
               value: {{ .Values.central.endpoint }} 
