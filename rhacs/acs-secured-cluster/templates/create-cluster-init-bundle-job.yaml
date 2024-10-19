@@ -60,7 +60,7 @@ spec:
 
                 echo "Applying bundle"
                 # No jq in container, python to the rescue
-                cat /tmp/"$ROX_BUNDLE_NAME".yaml | base64 -d | oc apply -f -
+                oc apply -f /tmp/"$ROX_BUNDLE_NAME".yaml
 
                 # Touch SecuredCluster to force operator to reconcile
                 oc label SecuredCluster local-cluster cluster-init-job-status=created
