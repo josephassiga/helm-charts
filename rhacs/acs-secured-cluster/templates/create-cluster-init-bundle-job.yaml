@@ -3,7 +3,7 @@ kind: Job
 metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "2"
-  name: create-cluster-init-bundle
+  name: create-init-bundle
   namespace: stackrox
 spec:
   template:
@@ -111,7 +111,7 @@ spec:
                 echo "ACS Cluster init bundle generated and applied"
               fi
           imagePullPolicy: Always
-          name: create-cluster-init-bundle
+          name: apply-init-bundle
       volumes:
         - name: bundle
           emptyDir: {}
