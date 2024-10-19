@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Namespace
 metadata:
   labels:
-    openshift.io/display-name: Red Hat Advanced Cluster Security Operator Central compoment
+    openshift.io/display-name: ACS Central compoment
     openshift.io/cluster-monitoring: "true"
     argocd.argoproj.io/sync-wave: "0"
   name: stackrox
