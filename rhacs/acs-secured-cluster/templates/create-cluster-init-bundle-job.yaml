@@ -8,20 +8,32 @@ metadata:
 spec:
   template:
     spec:
-      containers:
+      initContainers:
         - image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
+          volumeMounts:
+            - mountPath: /data
+              name: bundle
           env:
-            - name: PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: central-htpasswd
-                  key: password
+            - name: CENTRAL_PASSWORD
+              value: {{ .Values.central.password }} 
+           # - name: CENTRAL_ENDPOINT
+           #   value: {{ .Values.central.endpoint }} 
+            - name: MAIN_CLUSTER_TOKEN
+              value: {{ .Values.mainCluster.token }}
+            - name: MAIN_CLUSTER_API
+              value: {{ .Values.mainCluster.api }}
           command:
             - /bin/bash
             - -c
             - |
               #!/usr/bin/env bash
-              if kubectl get secret/sensor-tls &> /dev/null; then
+              echo "connect to the main cluster where ACS is installed"
+              oc login --token=$MAIN_CLUSTER_TOKEN --server=$MAIN_CLUSTER_API
+              echo "connection succeed"
+              echo "Switch to project stackrox"
+              oc project stackrox
+
+              if oc get secret/sensor-tls &> /dev/null; then
                 echo "cluster-init bundle has already been configured, doing nothing"
                 exit 0
               else
@@ -44,14 +56,55 @@ spec:
 
                 echo "Configuring cluster-init bundle"
                 export DATA={\"name\":\"local-cluster\"}
-                curl -k -o /tmp/bundle.json -X POST -u "admin:$PASSWORD" -H "Content-Type: application/json" --data $DATA https://central/v1/cluster-init/init-bundles
+                curl -k -o /data/bundle.json -X POST -u "admin:$CENTRAL_PASSWORD " -H "Content-Type: application/json" --data $DATA https://central/v1/cluster-init/init-bundles
 
                 echo "Bundle received"
-                cat /tmp/bundle.json
+                cat /data/bundle.json
+
+                echo "Finish Generating Bundle file"
+          imagePullPolicy: Always
+          name: create-cluster-init-bundle
+      containers:
+        - image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
+          volumeMounts:
+            - mountPath: /data
+              name: bundle
+          env:
+            - name: CENTRAL_ENDPOINT
+              value: {{.Values.central.endpoint}}
+
+          command:
+            - /bin/bash
+            - -c
+            - |
+              #!/usr/bin/env bash
+              if oc get secret/sensor-tls &> /dev/null; then
+                echo "cluster-init bundle has already been configured, doing nothing"
+                exit 0
+              else
+
+                # Wait for central to be ready
+                attempt_counter=0
+                max_attempts=20
+                echo "Waiting for central to be available..."
+                until $(curl -k --output /dev/null --silent --head --fail $CENTRAL_ENDPOINT); do
+                    if [ ${attempt_counter} -eq ${max_attempts} ];then
+                      echo "Max attempts reached"
+                      exit 1
+                    fi
+
+                    printf '.'
+                    attempt_counter=$(($attempt_counter+1))
+                    echo "Made attempt $attempt_counter, waiting..."
+                    sleep 5
+                done
+
+                # Display init bundle generated
+                cat /data/bundle.json
 
                 echo "Applying bundle"
                 # No jq in container, python to the rescue
-                cat /tmp/bundle.json | python3 -c "import sys, json; print(json.load(sys.stdin)['kubectlBundle'])" | base64 -d | oc apply -f -
+                cat /data/bundle.json | python3 -c "import sys, json; print(json.load(sys.stdin)['kubectlBundle'])" | base64 -d | oc apply -f -
                 # Touch SecuredCluster to force operator to reconcile
                 oc label SecuredCluster local-cluster cluster-init-job-status=created
 
@@ -59,6 +112,23 @@ spec:
               fi
           imagePullPolicy: Always
           name: create-cluster-init-bundle
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      volumes:
+        - name: bundle
+          emptyDir: {}
       dnsPolicy: ClusterFirst
       restartPolicy: Never
       serviceAccount: create-cluster-init

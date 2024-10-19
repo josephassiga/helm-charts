@@ -5,3 +5,17 @@ createClusterInitBundle:
       tag: latest
     imagePullPolicy: Always
 kubernetesClusterDomain: cluster.local
+
+# SecuredCluster Configuration.
+clusterName: 
+
+# Job Configuration
+mainCluster:
+  token:
+  api:
+
+central:
+  user:
+  password:
+  endpoint:
+
