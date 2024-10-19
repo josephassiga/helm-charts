@@ -28,7 +28,7 @@ spec:
             - |
               #!/usr/bin/env bash
               echo "connect to the main cluster where ACS is installed"
-              oc login --token=$MAIN_CLUSTER_TOKEN --server=$MAIN_CLUSTER_API
+              oc login --token=$MAIN_CLUSTER_TOKEN --server=$MAIN_CLUSTER_API --insecure-skip-tls-verify
               echo "connection succeed"
               echo "Switch to project stackrox"
               oc project stackrox
