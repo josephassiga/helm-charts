@@ -63,7 +63,7 @@ spec:
 
                 echo "Finish Generating Bundle file"
           imagePullPolicy: Always
-          name: create-cluster-init-bundle
+          name: create-init-bundle
       containers:
         - image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
           volumeMounts:
