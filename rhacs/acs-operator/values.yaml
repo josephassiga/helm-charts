@@ -6,11 +6,11 @@
 helper-operator:
   operators:
     rhacs-operator:
-      enabled: false
+      enabled: true
       syncwave: '0'
       namespace:
         name: rhacs-operator
-        create: false
+        create: true
       subscription:
         channel: stable
         approval: Atomatic
@@ -26,7 +26,7 @@ helper-operator:
 # Subchart helper-status-checker
 # checks if ACS operator is ready
 helper-status-checker:
-  enabled: false
+  enabled: true
 
   checks:
 
