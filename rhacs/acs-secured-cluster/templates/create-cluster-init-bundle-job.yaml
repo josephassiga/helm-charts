@@ -8,106 +8,64 @@ metadata:
 spec:
   template:
     spec:
-      initContainers:
-        - image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
-          volumeMounts:
-            - mountPath: /data
-              name: bundle
-          env:
-            - name: CENTRAL_PASSWORD
-              value: {{ .Values.central.password }} 
-           # - name: CENTRAL_ENDPOINT
-           #   value: {{ .Values.central.endpoint }} 
-            - name: MAIN_CLUSTER_TOKEN
-              value: {{ .Values.mainCluster.token }}
-            - name: MAIN_CLUSTER_API
-              value: {{ .Values.mainCluster.api }}
-          command:
-            - /bin/bash
-            - -c
-            - |
-              #!/usr/bin/env bash
-              echo "connect to the main cluster where ACS is installed"
-              oc login --token=$MAIN_CLUSTER_TOKEN --server=$MAIN_CLUSTER_API --insecure-skip-tls-verify
-              echo "connection succeed"
-              echo "Switch to project stackrox"
-              oc project stackrox
-
-              if oc get secret/sensor-tls &> /dev/null; then
-                echo "cluster-init bundle has already been configured, doing nothing"
-                exit 0
-              else
-
-                # Wait for central to be ready
-                attempt_counter=0
-                max_attempts=20
-                echo "Waiting for central to be available..."
-                until $(curl -k --output /dev/null --silent --head --fail https://central); do
-                    if [ ${attempt_counter} -eq ${max_attempts} ];then
-                      echo "Max attempts reached"
-                      exit 1
-                    fi
-
-                    printf '.'
-                    attempt_counter=$(($attempt_counter+1))
-                    echo "Made attempt $attempt_counter, waiting..."
-                    sleep 5
-                done
-
-                echo "Configuring cluster-init bundle"
-                export DATA={\"name\":\"local-cluster\"}
-                curl -k -o /data/bundle.json -X POST -u "admin:$CENTRAL_PASSWORD " -H "Content-Type: application/json" --data $DATA https://central/v1/cluster-init/init-bundles
-
-                echo "Bundle received"
-                cat /data/bundle.json
-
-                echo "Finish Generating Bundle file"
-          imagePullPolicy: Always
-          name: create-init-bundle
       containers:
         - image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
           volumeMounts:
             - mountPath: /data
               name: bundle
           env:
-            - name: CENTRAL_ENDPOINT
-              value: {{.Values.central.endpoint}}
-
+            - name: ROX_CENTRAL_ENDPOINT
+              value: {{ .Values.central.endpoint }} 
+            - name: ROX_API_TOKEN
+              value:  {{ .Values.central.token }}
+            - name: ROX_BUNDLE_NAME
+              value:  {{ .Values.clusterName }}
           command:
             - /bin/bash
             - -c
             - |
               #!/usr/bin/env bash
+              set +x
+              export NO_COLOR="True"
+              # Wait for central to be ready
+              attempt_counter=0
+              max_attempts=20
+              echo "Waiting for central to be available..."
+              until $(curl -k --output /dev/null --silent --head --fail https://$ROX_CENTRAL_ENDPOINT:443); do
+                  if [ ${attempt_counter} -eq ${max_attempts} ];then
+                    echo "Max attempts reached"
+                    exit 1
+                  fi
+
+                  printf '.'
+                  attempt_counter=$(($attempt_counter+1))
+                  echo "Made attempt $attempt_counter, waiting..."
+                  sleep 5
+              done
+              echo "The central is available ..."
+
+              curl -s -k -L -H "Authorization: Bearer $ROX_API_TOKEN" https://$ROX_CENTRAL_ENDPOINT:443/api/cli/download/roxctl-linux -o roxctl
+              
+              chmod +x ./roxctl
+
+              ./roxctl --insecure-skip-tls-verify central init-bundles generate $ROX_BUNDLE_NAME  --endpoint $ROX_CENTRAL_ENDPOINT:443  --ouput /tmp/"$ROX_BUNDLE_NAME".yaml
+              
               if oc get secret/sensor-tls &> /dev/null; then
                 echo "cluster-init bundle has already been configured, doing nothing"
                 exit 0
               else
 
-                # Wait for central to be ready
-                attempt_counter=0
-                max_attempts=20
-                echo "Waiting for central to be available..."
-                until $(curl -k --output /dev/null --silent --head --fail $CENTRAL_ENDPOINT); do
-                    if [ ${attempt_counter} -eq ${max_attempts} ];then
-                      echo "Max attempts reached"
-                      exit 1
-                    fi
-
-                    printf '.'
-                    attempt_counter=$(($attempt_counter+1))
-                    echo "Made attempt $attempt_counter, waiting..."
-                    sleep 5
-                done
-
                 # Display init bundle generated
-                cat /data/bundle.json
+                cat /tmp/"$ROX_BUNDLE_NAME".yaml
 
                 echo "Applying bundle"
                 # No jq in container, python to the rescue
-                cat /data/bundle.json | python3 -c "import sys, json; print(json.load(sys.stdin)['kubectlBundle'])" | base64 -d | oc apply -f -
+                #cat /data/bundle.json | python3 -c "import sys, json; print(json.load(sys.stdin)['kubectlBundle'])" | base64 -d | oc apply -f -
+
+                cat /tmp/"$ROX_BUNDLE_NAME".yaml | oc apply -f -
                 # Touch SecuredCluster to force operator to reconcile
                 oc label SecuredCluster local-cluster cluster-init-job-status=created
-
+                
                 echo "ACS Cluster init bundle generated and applied"
               fi
           imagePullPolicy: Always

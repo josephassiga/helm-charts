@@ -1,13 +1,8 @@
 # SecuredCluster Configuration.
-clusterName: 
-
-# Job Configuration
-mainCluster:
-  token:
-  api:
+clusterName: local-cluster
 
 central:
-  password:
+  token: ''
   # put this value with https
-  endpoint: 
+  endpoint: ''
 
