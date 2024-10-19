@@ -60,9 +60,8 @@ spec:
 
                 echo "Applying bundle"
                 # No jq in container, python to the rescue
-                #cat /data/bundle.json | python3 -c "import sys, json; print(json.load(sys.stdin)['kubectlBundle'])" | base64 -d | oc apply -f -
+                cat /tmp/"$ROX_BUNDLE_NAME".yaml | base64 -d | oc apply -f -
 
-                cat /tmp/"$ROX_BUNDLE_NAME".yaml | oc apply -f -
                 # Touch SecuredCluster to force operator to reconcile
                 oc label SecuredCluster local-cluster cluster-init-job-status=created
 
