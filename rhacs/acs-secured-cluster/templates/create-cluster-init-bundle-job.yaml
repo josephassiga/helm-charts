@@ -48,7 +48,7 @@ spec:
               
               chmod +x /tmp/roxctl
 
-              /tmp/roxctl --insecure-skip-tls-verify central init-bundles generate $ROX_BUNDLE_NAME  --endpoint $ROX_CENTRAL_ENDPOINT:443  --output /tmp/"$ROX_BUNDLE_NAME".yaml
+              /tmp/roxctl --insecure-skip-tls-verify central init-bundles generate $ROX_BUNDLE_NAME  --endpoint $ROX_CENTRAL_ENDPOINT:443  --output-secrets /tmp/"$ROX_BUNDLE_NAME".yaml
               
               if oc get secret/sensor-tls &> /dev/null; then
                 echo "cluster-init bundle has already been configured, doing nothing"
@@ -69,9 +69,6 @@ spec:
               fi
           imagePullPolicy: Always
           name: apply-init-bundle
-      volumes:
-        - name: bundle
-          emptyDir: {}
       dnsPolicy: ClusterFirst
       restartPolicy: Never
       serviceAccount: rhacs-services
