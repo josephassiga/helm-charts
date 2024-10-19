@@ -13,10 +13,11 @@ helper-operator:
         create: true
       subscription:
         channel: stable
-        approval: Atomatic
+        approval: Manual
         operatorName: rhacs-operator
         source: redhat-operators
         sourceNamespace: openshift-marketplace
+        startingCSV: rhacs-operator.v4.5.3
       operatorgroup:
         create: true
         # rhacs does not support to monitor own namespace,
