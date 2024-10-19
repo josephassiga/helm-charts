@@ -44,7 +44,7 @@ spec:
               done
               echo "The central is available ..."
 
-              curl -s -k -L -H "Authorization: Bearer $ROX_API_TOKEN" https://$ROX_CENTRAL_ENDPOINT:443/api/cli/download/roxctl-linux -o roxctl
+              curl -s -k -L -H "Authorization: Bearer $ROX_API_TOKEN" https://$ROX_CENTRAL_ENDPOINT:443/api/cli/download/roxctl-linux -o ./roxctl
               
               chmod +x ./roxctl
 
@@ -65,7 +65,7 @@ spec:
                 cat /tmp/"$ROX_BUNDLE_NAME".yaml | oc apply -f -
                 # Touch SecuredCluster to force operator to reconcile
                 oc label SecuredCluster local-cluster cluster-init-job-status=created
-                
+
                 echo "ACS Cluster init bundle generated and applied"
               fi
           imagePullPolicy: Always
