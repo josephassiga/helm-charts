@@ -117,6 +117,6 @@ spec:
           emptyDir: {}
       dnsPolicy: ClusterFirst
       restartPolicy: Never
-      serviceAccount: create-cluster-init
-      serviceAccountName: create-cluster-init
+      serviceAccount: rhacs-services
+      serviceAccountName: rhacs-services
       terminationGracePeriodSeconds: 30
