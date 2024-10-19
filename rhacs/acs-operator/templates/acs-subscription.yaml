@@ -12,4 +12,4 @@ spec:
   name: rhacs-operator
   source: redhat-operators
   sourceNamespace: openshift-marketplace
-  startingCSV: rhacs-operator.v4.5.3
+  startingCSV: rhacs-operator.v4.5.4
