@@ -1,9 +1,0 @@
-dependencies:
-- name: helper-operator
-  repository: https://redhat-cop.github.io/helm-charts
-  version: 1.0.26
-- name: helper-status-checker
-  repository: https://redhat-cop.github.io/helm-charts
-  version: 4.0.9
-digest: sha256:59e14849919b137be841f2169966bf4a58df757d9db2536c59c4f3674c776a39
-generated: "2024-10-19T13:32:42.275622+02:00"

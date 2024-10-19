@@ -19,14 +19,6 @@ version: 0.1.0
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
 appVersion: "0.1.0"
-#This are the dependencies used by this Chart to help install the ACS Operator.
-dependencies:
-  - name:  helper-operator
-    version: ~1.0.26
-    repository: https://redhat-cop.github.io/helm-charts
-  - name:  helper-status-checker
-    version: ~4.0.9
-    repository: https://redhat-cop.github.io/helm-charts
 maintainers:
   - name: Joseph Assiga
     email: jassigaa@redhat.com
