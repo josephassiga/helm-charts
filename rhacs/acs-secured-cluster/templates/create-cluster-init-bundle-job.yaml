@@ -69,6 +69,6 @@ spec:
         resources: {}
       dnsPolicy: ClusterFirst
       restartPolicy: Never
-      serviceAccount: create-cluster-init
-      serviceAccountName: create-cluster-init
+      serviceAccount: rhacs-services
+      serviceAccountName: crhacs-services
       terminationGracePeriodSeconds: 30

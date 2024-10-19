@@ -3,8 +3,10 @@ apiVersion: platform.stackrox.io/v1alpha1
 kind: Central
 metadata:
   annotations:
+    kubernetes.io/metadata.name: rhacs-central
     argocd.argoproj.io/sync-wave: "1"
   name: central
+  namespace: stackrox
 spec:
   central:
     exposure:
