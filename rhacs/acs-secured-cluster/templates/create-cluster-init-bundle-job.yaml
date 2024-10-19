@@ -4,7 +4,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "2"
   name: create-cluster-init-bundle
-  name: stackrox
+  namespace: stackrox
 spec:
   template:
     spec:
