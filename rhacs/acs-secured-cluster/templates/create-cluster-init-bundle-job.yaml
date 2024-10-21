@@ -3,7 +3,7 @@ kind: Job
 metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "1"
-  name: create-init-bundle
+  name: create-cluster-init-bundle
   namespace: stackrox
 spec:
   template:
@@ -81,7 +81,7 @@ spec:
                 echo "INFO: ACS Cluster init bundle generated and applied"
               fi
           imagePullPolicy: Always
-          name: apply-init-bundle
+          name: create-cluster-init-bundle
       dnsPolicy: ClusterFirst
       restartPolicy: Never
       serviceAccount: rhacs-services
