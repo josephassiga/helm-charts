@@ -48,6 +48,18 @@ This chart will create the following ressources:
 > This ressource should only be installed on each cluster to be managed by ACS.
 > It is required to have ACS operator installed to have all the CRD.
 
+To use this chart, you will need to get Central endpoint and an API TOKEN.
+```yaml
+# SecuredCluster Configuration.
+clusterName: local-cluster ## use in SecuredCluster ressource  as the value of the clusterName parameter.
+
+central:
+  token: ''
+  # put this value with https
+  endpoint: ''
+```
+
+
 This chart will create the following ressources:
 - create-cluster-init-bundle-sa.yaml :
     - Create Role `rhacs-services` in the namespaces `stackrox` with rigths `list,get,create,patch,update` on ressources `platform.stackrox.io`and `securedClusters`.
