@@ -1,0 +1,37 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+  name: acs-operator-installer
+  namespace: stackrox
+rules:
+  - apiGroups:
+      - operators.coreos.com
+    resources:
+      - InstallPlan
+    verbs:
+      - get
+      - list
+      - patch
+      - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: acs-operator-installer
+  namespace: stackrox
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: acs-operator-installer
+subjects:
+  - kind: ServiceAccount
+    name: acs-operator-installer
+    namespace: stackrox
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: acs-operator-installer
+  namespace: stackrox

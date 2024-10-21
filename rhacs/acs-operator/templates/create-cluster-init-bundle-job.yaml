@@ -1,0 +1,48 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+  name: acs-operator-installplan-approver
+  namespace: stackrox
+spec:
+  template:
+    spec:
+      containers:
+        - image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
+          command:
+            - /bin/bash
+            - -c
+            - |
+              #!/usr/bin/env bash
+              # Wait for central to be ready
+              attempt_counter=0
+              max_attempts=20
+              INSTALL_PLAN=''
+              echo "Waiting for InstallPlan to be available..."
+              while true;do
+                INSTALL_PLAN=$(oc get installplan -n stackrox --no-headers | awk '{print $1}')
+                if [ -n "$INSTALL_PLAN" ];then
+                    echo "INFO: InstallPlan $INSTALL_PLAN of ACS operator now exist... "
+                    break;
+                fi
+
+                echo "Waiting for ACS InstallPlan to be generated ..."
+                sleep 5
+              done
+
+              # Update the installPlan
+              oc patch installplan $INSTALL_PLAN -n stackrox --type merge --patch '{"spec":{"approved":true}}'
+              if [ $? -eq 0 ]; then
+                  echo "INFO: Update installPlan of ACS Operator succeed"
+              else
+                  echo "Error: Failed to update the InstallPlan of the ACS Operator"
+                  exit 1
+              fi
+          imagePullPolicy: Always
+          name: approve-acs-operator-installplan
+      dnsPolicy: ClusterFirst
+      restartPolicy: Never
+      serviceAccount: acs-operator-installer
+      serviceAccountName: acs-operator-installer
+      terminationGracePeriodSeconds: 30
