@@ -4,7 +4,7 @@
 The goal of this Helm charts is to provides Helm charts that will manage the deployment of ACS components into cluster.
 
 ## Getting Started
-To install ACS different components as follow :
+To install ACS Operator, you need to install their components as follow :
 
 ### Install ACS Operator
 
