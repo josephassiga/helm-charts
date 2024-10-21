@@ -22,7 +22,7 @@ This chart will create the following ressources:
     - Create Subcription `rhacs-operator`
 - acs-services.namespaces.yaml: 
     - Create Namespace `stackrox` where we will install the Central and SecuredCluster components.
-- acs-operator-installplan-approver-.yaml :
+- acs-operator-installplan-approver-sa.yaml :
     - Create Role `acs-operator-installplan-approver` in the namespaces `rhacs-operator` with rigths `list,get,patch,update` on ressource `installplans`.
     - Create RoleBinding `acs-operator-installer` in the namespaces `rhacs-operator`
     - Create ServiceAccount `acs-operator-installer`
