@@ -9,7 +9,7 @@ rules:
   - apiGroups:
       - operators.coreos.com
     resources:
-      - InstallPlans
+      - installplans
     verbs:
       - get
       - list
