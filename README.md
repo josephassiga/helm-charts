@@ -41,7 +41,7 @@ This chart will create the following ressources:
 This chart will create the following ressources:
 - create-cluster-init-bundle-sa.yaml :
     - Create Role `rhacs-services` in the namespaces `stackrox` with rigths `list,get,create,patch,update` on ressources `platform.stackrox.io`and `securedClusters`.
-    - Create ROleBinding `rhacs-services` in the namespaces `stackrox`
+    - Create RoleBinding `rhacs-services` in the namespaces `stackrox`
     - Create ServiceAccount `rhacs-services`
 
 - create-cluster-init-bundle-job.yaml:
