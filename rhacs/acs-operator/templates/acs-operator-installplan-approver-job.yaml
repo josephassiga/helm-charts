@@ -21,7 +21,7 @@ spec:
               INSTALL_PLAN=''
               echo "Waiting for InstallPlan to be available..."
               while true;do
-                INSTALL_PLAN=$(oc get installplan -n rhacs-operator --no-headers --output /dev/null | awk '{print $1}')
+                INSTALL_PLAN=$(oc get installplan -n rhacs-operator --no-headers | awk '{print $1}' 2>/dev/null)
                 if [ -n "$INSTALL_PLAN" ];then
                     echo "INFO: InstallPlan $INSTALL_PLAN of ACS operator now exist... "
                     break;
