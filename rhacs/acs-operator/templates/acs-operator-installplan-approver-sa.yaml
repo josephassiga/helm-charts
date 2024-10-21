@@ -4,7 +4,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "3"
   name: acs-operator-installer
-  namespace: stackrox
+  namespace: rhacs-operator
 rules:
   - apiGroups:
       - operators.coreos.com
@@ -20,7 +20,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: acs-operator-installer
-  namespace: stackrox
+  namespace: rhacs-operator
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -28,10 +28,10 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: acs-operator-installer
-    namespace: stackrox
+    namespace: rhacs-operator
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: acs-operator-installer
-  namespace: stackrox
+  namespace: rhacs-operator

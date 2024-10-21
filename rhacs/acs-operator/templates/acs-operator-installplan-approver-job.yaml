@@ -4,7 +4,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "4"
   name: acs-operator-installplan-approver
-  namespace: stackrox
+  namespace: rhacs-operator
 spec:
   template:
     spec:
@@ -21,7 +21,7 @@ spec:
               INSTALL_PLAN=''
               echo "Waiting for InstallPlan to be available..."
               while true;do
-                INSTALL_PLAN=$(oc get installplan -n stackrox --no-headers | awk '{print $1}')
+                INSTALL_PLAN=$(oc get installplan -n rhacs-operator --no-headers --output /dev/null | awk '{print $1}')
                 if [ -n "$INSTALL_PLAN" ];then
                     echo "INFO: InstallPlan $INSTALL_PLAN of ACS operator now exist... "
                     break;
@@ -32,7 +32,7 @@ spec:
               done
 
               # Update the installPlan
-              oc patch installplan $INSTALL_PLAN -n stackrox --type merge --patch '{"spec":{"approved":true}}'
+              oc patch installplan $INSTALL_PLAN -n rhacs-operator --type merge --patch '{"spec":{"approved":true}}'
               if [ $? -eq 0 ]; then
                   echo "INFO: Update installPlan of ACS Operator succeed"
               else
