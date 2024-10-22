@@ -73,6 +73,11 @@ central:
 
 ![Fill the form](./rhacs/images/apitokenform.png)
 
+##### Get ACS Endpoint
+```bash
+#Example: central-stackrox.apps.cluster-6gpg5.6gpg5.sandbox2279.opentlc.com
+$ oc get route central -n stackrox --no-headers | awk '{print $2}'
+```
 This chart will create the following ressources:
 - create-cluster-init-bundle-sa.yaml :
     - Create Role `rhacs-services` in the namespaces `stackrox` with rigths `list,get,create,patch,update` on ressources `platform.stackrox.io`and `securedClusters`.
