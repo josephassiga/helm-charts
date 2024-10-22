@@ -17,7 +17,7 @@ To use this chart, you will need to configure approvalPlan and operator version.
 ```yaml
 # ApprovalPlan values : Manual or Automatic
 operator:
-  approvalPlan: Manual
+  approvalPlan: Automatic
   version: rhacs-operator.v4.5.3
 ```
 
