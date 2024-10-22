@@ -19,8 +19,8 @@ spec:
             - |
               #!/usr/bin/env bash
               if [ "$OP_APPROVAL_PLAN" == "Automatic" ];then
-                 echo "INFO: Install Plan strategy $INSTALL_PLAN does not require no more action."
-                 echo 0
+                 echo "INFO: Install Plan strategy $OP_APPROVAL_PLAN does not require no more action."
+                 exit 0
               else
                 # Wait for InstallPlan to be created.
                 attempt_counter=0
