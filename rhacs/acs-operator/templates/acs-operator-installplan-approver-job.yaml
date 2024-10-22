@@ -10,34 +10,42 @@ spec:
     spec:
       containers:
         - image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
+          env:
+            - name: OP_APPROVAL_PLAN
+              value: {{ .Values.operator.approvalPlan }} 
           command:
             - /bin/bash
             - -c
             - |
               #!/usr/bin/env bash
-              # Wait for central to be ready
-              attempt_counter=0
-              max_attempts=20
-              INSTALL_PLAN=''
-              echo "Waiting for InstallPlan to be available..."
-              while true;do
-                INSTALL_PLAN=$(oc get installplan -n rhacs-operator --no-headers | awk '{print $1}' 2>/dev/null)
-                if [ -n "$INSTALL_PLAN" ];then
-                    echo "INFO: InstallPlan $INSTALL_PLAN of ACS operator now exist... "
-                    break;
-                fi
-
-                echo "Waiting for ACS InstallPlan to be generated ..."
-                sleep 5
-              done
-
-              # Update the installPlan
-              oc patch installplan $INSTALL_PLAN -n rhacs-operator --type merge --patch '{"spec":{"approved":true}}'
-              if [ $? -eq 0 ]; then
-                  echo "INFO: Update installPlan of ACS Operator succeed"
+              if [ "$OP_APPROVAL_PLAN" == "Automatic" ];then
+                 echo "INFO: Install Plan strategy $INSTALL_PLAN does not require no more action."
+                 echo 0
               else
-                  echo "Error: Failed to update the InstallPlan of the ACS Operator"
-                  exit 1
+                # Wait for InstallPlan to be created.
+                attempt_counter=0
+                max_attempts=20
+                INSTALL_PLAN=''
+                echo "INFO: Waiting for InstallPlan to be available..."
+                while true;do
+                  INSTALL_PLAN=$(oc get installplan -n rhacs-operator --no-headers | awk '{print $1}' 2>/dev/null)
+                  if [ -n "$INSTALL_PLAN" ];then
+                      echo "INFO: InstallPlan $INSTALL_PLAN of ACS operator now exist... "
+                      break;
+                  fi
+
+                  echo "Waiting for ACS InstallPlan to be generated ..."
+                  sleep 5
+                done
+
+                # Update the installPlan
+                oc patch installplan $INSTALL_PLAN -n rhacs-operator --type merge --patch '{"spec":{"approved":true}}'
+                if [ $? -eq 0 ]; then
+                    echo "INFO: Update installPlan of ACS Operator succeed"
+                else
+                    echo "Error: Failed to update the InstallPlan of the ACS Operator"
+                    exit 1
+                fi
               fi
           imagePullPolicy: Always
           name: approve-acs-operator-installplan
