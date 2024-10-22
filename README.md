@@ -66,7 +66,12 @@ central:
   # put this value with https
   endpoint: ''
 ```
+##### Get API TOKEN
+![Go to Integrations](./images/integration.png)
 
+![GO to API TOKEN](apitoken.png)
+
+![Fill the form](apitokenform.png)
 
 This chart will create the following ressources:
 - create-cluster-init-bundle-sa.yaml :
