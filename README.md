@@ -69,7 +69,7 @@ central:
 ##### Get API TOKEN
 ![Go to Integrations](./rhacs/images/integrations.png)
 
-![GO to API TOKEN](./rhacs/imagesapitoken.png)
+![GO to API TOKEN](./rhacs/images/apitoken.png)
 
 ![Fill the form](./rhacs/images/apitokenform.png)
 
