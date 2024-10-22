@@ -12,6 +12,14 @@ To install ACS Operator, you need to install their components as follow :
 
 > [!NOTE]
 > This ressource is required on every cluster, it install all CRD.
+To use this chart, you will need to configure approvalPlan and operator version.
+
+```yaml
+# ApprovalPlan values : Manual or Automatic
+operator:
+  approvalPlan: Manual
+  version: rhacs-operator.v4.5.3
+```
 
 This chart will create the following ressources:
 - acs-namespaces.yaml : 
