@@ -67,11 +67,11 @@ central:
   endpoint: ''
 ```
 ##### Get API TOKEN
-![Go to Integrations](./images/integration.png)
+![Go to Integrations](./rhacs/images/integrations.png)
 
-![GO to API TOKEN](apitoken.png)
+![GO to API TOKEN](./rhacs/imagesapitoken.png)
 
-![Fill the form](apitokenform.png)
+![Fill the form](./rhacs/images/apitokenform.png)
 
 This chart will create the following ressources:
 - create-cluster-init-bundle-sa.yaml :
