@@ -9,6 +9,9 @@ metadata:
   namespace: stackrox
 spec:
   central:
+    declarativeConfiguration :
+      configMaps:
+        - name: declarative-configurations
     exposure:
       loadBalancer:
         enabled: false
