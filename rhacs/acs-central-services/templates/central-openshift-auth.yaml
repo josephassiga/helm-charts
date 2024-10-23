@@ -11,8 +11,6 @@ metadata:
   annotations:
     kubernetes.io/metadata.name: rhacs-central
     argocd.argoproj.io/sync-wave: "1"
-    argocd.argoproj.io/hook: PostSync
-    argocd.argoproj.io/hook-delete-policy: HookSucceeded
   name: declarative-configurations
   namespace: stackrox
 data:
