@@ -4,7 +4,7 @@ kind: Central
 metadata:
   annotations:
     kubernetes.io/metadata.name: rhacs-central
-    argocd.argoproj.io/sync-wave: "0"
+    argocd.argoproj.io/sync-wave: "1"
   name: stackrox-central-services
   namespace: stackrox
 spec:
