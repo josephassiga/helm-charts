@@ -46,6 +46,19 @@ This chart will create the following ressources:
 > [!CAUTION]
 > This ressource should only be installed on the cluster where ACS will be installed.
 
+To use this chart, you will need to add the diffent groups as here :
+
+```yaml
+oauth_provider:
+  groups:
+    - key: groups
+      value: Admin
+      role: Admin
+    - key: email
+      value: job@red.com
+      role: Admin
+```
+
 This chart will create the following ressources:
 - central-services.yaml : 
     - Create Central ressources `stackrox-central-services` in the namespaces `stackrox`.
@@ -78,6 +91,7 @@ central:
 #Example: central-stackrox.apps.cluster-6gpg5.6gpg5.sandbox2279.opentlc.com
 $ oc get route central -n stackrox --no-headers | awk '{print $2}'
 ```
+
 This chart will create the following ressources:
 - create-cluster-init-bundle-sa.yaml :
     - Create Role `rhacs-services` in the namespaces `stackrox` with rigths `list,get,create,patch,update` on ressources `platform.stackrox.io`and `securedClusters`.
