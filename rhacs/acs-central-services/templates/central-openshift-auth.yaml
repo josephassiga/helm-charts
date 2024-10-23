@@ -1,3 +1,10 @@
+
+{{ $route := ternary (lookup "config.openshift.io/v1" "Ingress" "" "cluster") "" true }}
+{{ if $route }}
+  {{ $route =printf "%s%s"  "central-stackrox." $route.spec.domain }}
+{{ else }}
+  {{ $route = "" }}
+{{ end }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -11,7 +18,7 @@ metadata:
 data:
   openshift-auth.yaml: |
     name: Openshift-Auth
-    uiEndpoint: central-stackrox.{{ (lookup "config.openshift.io/v1" "Ingress" "" "cluster").spec.domain }} 
+    uiEndpoint: {{ $route }} 
     groups:
     {{ .Values.oauth_provider.groups | toYaml | indent 4 | trim }}
     openshift:
