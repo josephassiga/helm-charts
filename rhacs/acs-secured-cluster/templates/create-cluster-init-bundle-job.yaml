@@ -48,7 +48,7 @@ spec:
                 echo "INFO: The central is available ..."
                 echo "INFO: Generating cluster-init bundle"
                 export DATA={\"name\":\"$ROX_BUNDLE_NAME\"}
-                curl -k -o /tmp/bundle.json -X POST -u "admin:$PASSWORD" -H "Content-Type: application/json" --data $DATA https://central/v1/cluster-init/init-bundles
+                curl -k -o /tmp/bundle.json -X POST -u "admin:$PASSWORD" -H "Content-Type: application/json" --data $DATA https://$ROX_CENTRAL_ENDPOINT:443/v1/cluster-init/init-bundles
                 if [ $? -eq 0 ]; then
                     echo "INFO: Retrieve init bundles succeed"
                 else
