@@ -13,6 +13,7 @@ spec:
     listenOnEvents: true
     listenOnUpdates: false
   clusterName: {{.Values.clusterName }} 
+  centralEndpoint:  {{.Values.central.endpoint }}:443
   perNode:
     collector:
       collection: EBPF

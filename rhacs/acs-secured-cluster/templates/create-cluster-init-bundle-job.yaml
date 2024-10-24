@@ -13,8 +13,6 @@ spec:
           env:
             - name: ROX_CENTRAL_ENDPOINT
               value: {{ .Values.central.endpoint }} 
-            - name: ROX_API_TOKEN
-              value:  {{ .Values.central.token }}
             - name: ROX_BUNDLE_NAME
               value:  {{ .Values.clusterName }}
           command:
@@ -39,7 +37,8 @@ spec:
               done
               echo "INFO: The central is available ..."
 
-              curl -s -v -k -L -H "Authorization: Bearer $ROX_API_TOKEN" https://$ROX_CENTRAL_ENDPOINT:443/api/cli/download/roxctl-linux -o /tmp/roxctl
+              arch="$(uname -m | sed "s/x86_64//")"; arch="${arch:+-$arch}"
+              curl -L -f -o /tmp/roxctl "https://mirror.openshift.com/pub/rhacs/assets/4.5.4/bin/Linux/roxctl${arch}"
               if [ $? -eq 0 ]; then
                   echo "INFO: Retrieve of roxctl command succeed"
               else
