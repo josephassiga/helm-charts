@@ -49,7 +49,7 @@ spec:
                 echo "INFO: Generating cluster-init bundle"
                 export DATA={\"name\":\"$ROX_BUNDLE_NAME\"}
                 echo "DATA: $DATA"
-                curl -v -k -o /tmp/bundle.json -X POST -u "admin:$PASSWORD" -H "Content-Type: application/json" --data $DATA https://$ROX_CENTRAL_ENDPOINT:443/v1/cluster-init/init-bundles
+                curl -k -o /tmp/bundle.json -X POST -u "admin:$PASSWORD" -H "Content-Type: application/json" --data $DATA https://$ROX_CENTRAL_ENDPOINT:443/v1/cluster-init/init-bundles
                 if [ $? -eq 0 ]; then
                     echo "INFO: Retrieve init bundles succeed"
                 else
@@ -62,8 +62,6 @@ spec:
                 echo "Applying bundle"
                 # No jq in container, python to the rescue
                 cat /tmp/bundle.json | python3 -c "import sys, json; print(json.load(sys.stdin)['kubectlBundle'])" | base64 -d | oc apply -f -
-                # Touch SecuredCluster to force operator to reconcile
-                oc label SecuredCluster local-cluster cluster-init-job-status=created
 
                 echo "INFO: ACS Cluster init bundle generated and applied"
               fi
