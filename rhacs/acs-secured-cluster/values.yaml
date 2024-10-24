@@ -2,7 +2,6 @@
 clusterName: local-cluster
 
 central:
-  token: ''
   # put this value with https
   endpoint: ''
 
