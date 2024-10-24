@@ -3,7 +3,7 @@ kind: Job
 metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "1"
-  name: create-cluster-init-bundle
+  name: create-init-bundle
   namespace: stackrox
 spec:
   template:
@@ -13,8 +13,15 @@ spec:
           env:
             - name: ROX_CENTRAL_ENDPOINT
               value: {{ .Values.central.endpoint }} 
+            - name: ROX_API_TOKEN
+              value:  {{ .Values.central.token }}
             - name: ROX_BUNDLE_NAME
               value:  {{ .Values.clusterName }}
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: central-admin
+                  key: password
           command:
             - /bin/bash
             - -c
@@ -37,8 +44,7 @@ spec:
               done
               echo "INFO: The central is available ..."
 
-              arch="$(uname -m | sed "s/x86_64//")"; arch="${arch:+-$arch}"
-              curl -L -f -o /tmp/roxctl "https://mirror.openshift.com/pub/rhacs/assets/4.5.4/bin/Linux/roxctl${arch}"
+              curl -s -v -k -L -H "Authorization: Bearer admin:$PASSWORD" https://$ROX_CENTRAL_ENDPOINT:443/api/cli/download/roxctl-linux -o /tmp/roxctl
               if [ $? -eq 0 ]; then
                   echo "INFO: Retrieve of roxctl command succeed"
               else

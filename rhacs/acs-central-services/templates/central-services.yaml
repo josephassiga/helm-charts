@@ -9,6 +9,8 @@ metadata:
   namespace: stackrox
 spec:
   central:
+    adminPasswordSecret:
+      name: central-admin
     declarativeConfiguration :
       configMaps:
         - name: declarative-configurations
