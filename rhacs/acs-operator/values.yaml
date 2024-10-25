@@ -2,3 +2,8 @@
 operator:
   approvalPlan: Automatic
   version: rhacs-operator.v4.5.3
+components:
+  central:
+    enabled: true
+  securedcluster:
+    enabled: true

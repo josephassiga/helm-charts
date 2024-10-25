@@ -1,5 +1,5 @@
 apiVersion: v2
-name: acs-operator
+name: acs-secured-cluster
 description: A Helm chart for Kubernetes
 # A chart can be either an 'application' or a 'library' chart.
 #
@@ -19,19 +19,3 @@ version: 0.1.0
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
 appVersion: "0.1.0"
-maintainers:
-  - name: Joseph Assiga
-    email: jassigaa@redhat.com
-keywords:
-  - acs
-  - acs-operator
-  - operator
-dependencies:
-  - name: acs-central-services
-    version: 0.1.0
-    repository: file://components/acs-central-services
-    condition: components.central.enabled
-  - name: acs-secured-cluster
-    version: 0.1.0
-    repository: file://components/acs-secured-cluster
-    condition: components.securedcluster.enabled

@@ -1,0 +1,7 @@
+# SecuredCluster Configuration.
+clusterName: local-cluster
+
+central:
+  # put this value with https
+  endpoint: ''
+

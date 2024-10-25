@@ -1,2 +1,4 @@
 .DS_Store
 rhacs/.DS_Store
+rhacs/acs-operator/Chart.lock
+rhacs/acs-operator/charts/
