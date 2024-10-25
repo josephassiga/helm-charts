@@ -3,5 +3,5 @@ clusterName: local-cluster
 
 central:
   # put this value with https
-  endpoint: ''
+  endpoint: 'central-stackrox.apps.cluster-6gpg5.6gpg5.sandbox2279.opentlc.com'
 
