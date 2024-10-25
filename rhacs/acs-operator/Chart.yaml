@@ -35,3 +35,5 @@ dependencies:
     version: 0.1.0
     repository: file://components/acs-secured-cluster
     condition: components.securedcluster.enabled
+    import-values:
+      - clusterName
