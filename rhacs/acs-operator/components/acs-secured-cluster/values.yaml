@@ -1,7 +1,8 @@
 # SecuredCluster Configuration.
 clusterName: local-cluster
 
-central:
-  # put this value with https
-  endpoint: 'central-stackrox.apps.cluster-6gpg5.6gpg5.sandbox2279.opentlc.com'
+exports:
+  central:
+    # put this value with https
+    endpoint: 'central-stackrox.apps.cluster-6gpg5.6gpg5.sandbox2279.opentlc.com'
 
