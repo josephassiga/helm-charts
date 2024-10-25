@@ -14,7 +14,7 @@ spec:
             - name: ROX_CENTRAL_ENDPOINT
               value: {{ .Values.central.endpoint }} 
             - name: ROX_BUNDLE_NAME
-              value:  {{ .Values.clusterName }}
+              value:  {{ .Values.exports.cluster.clusterName }}
             - name: PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -34,14 +34,7 @@ spec:
               max_attempts=20
               echo "INFO: Waiting for central to be available..."
               until $(curl -k --output /dev/null --silent --head --fail https://$ROX_CENTRAL_ENDPOINT:443); do
-                  if [ ${attempt_counter} -eq ${max_attempts} ];then
-                    echo "INFO/ Max attempts reached"
-                    exit 1
-                  fi
-
-                  printf '.'
-                  attempt_counter=$(($attempt_counter+1))
-                  echo "INFO: Made attempt $attempt_counter, waiting..."
+                  echo "INFO: Waiting the central endpoint to be available..."
                   sleep 5
               done
 
