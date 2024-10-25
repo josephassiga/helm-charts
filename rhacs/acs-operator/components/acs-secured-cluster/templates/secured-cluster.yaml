@@ -12,7 +12,7 @@ spec:
     listenOnCreates: false
     listenOnEvents: true
     listenOnUpdates: false
-  clusterName: {{.Values.exports.cluster.clusterName }} 
+  clusterName: {{.Values.cluster.clusterName }} 
   centralEndpoint:  {{.Values.central.endpoint }}:443
   perNode:
     collector:

@@ -9,4 +9,6 @@ components:
   securedcluster:
     enabled: true
 
-clusterName: aro-mgmtlab
+acs-secured-cluster:
+  cluster:
+    clusterName: aro-mgmtlab

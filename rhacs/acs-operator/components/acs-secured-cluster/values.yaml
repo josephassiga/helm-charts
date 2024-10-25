@@ -1,7 +1,6 @@
 # SecuredCluster Configuration.
-exports:
-  cluster:
-    clusterName: local-cluster
+cluster:
+  clusterName: local-cluster
 
 
 central:
