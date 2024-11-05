@@ -1,0 +1,76 @@
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  annotations:
+    kubernetes.io/metadata.name: rhacs-central
+    argocd.argoproj.io/sync-wave: "7"
+  name: acs-create-backups
+  namespace: stackrox
+spec:
+  serviceAccountName: acs-backups
+  schedule: 0 1 * * * # Every Day at 1am
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Allow
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+    spec:
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          serviceAccountName: acs-backups
+          serviceAccount: acs-backups
+          volumes:
+            - name: acs-backups
+              persistentVolumeClaim:
+                claimName: acs-backups
+          containers:
+            - name: create-backups
+              image: registry.access.redhat.com/ubi8/ubi:8.10-1088
+              env:
+                - name: PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: central-admin
+                      key: password
+              command:
+                  - /bin/bash
+                  - -c
+                  - |
+                      #!/usr/bin/env bash
+                      
+                      curl -s -k -L --user "admin:$PASSWORD" https://central:443/api/cli/download/roxctl-linux -o /tmp/roxctl
+                      if [ $? -eq 0 ]; then
+                          echo "Retrieve of roxctl command succeed"
+                      else
+                          echo "Retrieve of roxctl command failed"
+                          exit 1
+                      fi
+
+                      chmod +x /tmp/roxctl
+                      if [ $? -eq 0 ]; then
+                          echo "Change roxctl command rigths succeed"
+                      else
+                          echo "Change roxctl command rigths failed"
+                          exit 1
+                      fi
+
+                      /tmp/roxctl -p $PASSWORD central backup --endpoint=https://central:443 --insecure-skip-tls-verify  --output /var/lib/acs/backups 
+                      if [ $? -eq 0 ]; then
+                          echo "INFO: Backup of the central succeed"
+                      else
+                          echo "Error: Backup of the central failed"
+                          exit 1
+                      fi
+              imagePullPolicy: IfNotPresent
+              volumeMounts:
+                - mountPath: /var/lib/acs/backups 
+                  name: acs-backups
+          dnsPolicy: ClusterFirst
+          restartPolicy: OnFailure
+          terminationGracePeriodSeconds: 30
+  

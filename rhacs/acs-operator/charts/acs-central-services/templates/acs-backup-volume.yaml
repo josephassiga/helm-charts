@@ -1,0 +1,16 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: acs-backups
+  namespace: stackrox
+  annotations:
+    kubernetes.io/metadata.name: rhacs-central
+    argocd.argoproj.io/sync-wave: "7"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
+  storageClassName: managed-csi
+  volumeMode: Filesystem

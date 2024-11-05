@@ -1,0 +1,42 @@
+kind: CronJob
+apiVersion: batch/v1
+metadata:
+  annotations:
+    kubernetes.io/metadata.name: rhacs-central
+    argocd.argoproj.io/sync-wave: "7"
+  name: acs-clean-backups
+  namespace: stackrox
+spec:
+  schedule: 10 1 * * *
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Allow
+  suspend: false
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+    spec:
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          serviceAccountName: acs-backups
+          serviceAccount: acs-backups
+          volumes:
+            - name: acs-backups
+              persistentVolumeClaim:
+                claimName: acs-backups
+          containers:
+            - name: clean-backups # Only delete the files older than 30 days ago.
+              image: registry.access.redhat.com/ubi8/ubi:8.10-1088
+              args:
+                - /bin/sh
+                - '-c'
+                - 'find /var/lib/acs/backups* -mtime +30 -exec rm {} \;'
+              volumeMounts:
+                - name: acs-backups
+                  mountPath: /var/lib/acs/backups 
+              imagePullPolicy: IfNotPresent
+          restartPolicy: OnFailure
+          terminationGracePeriodSeconds: 30
+ 
