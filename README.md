@@ -175,3 +175,9 @@ $ oc delete secret acs-central-cert -n stackrox || oc get secret $INGRESS_CERT -
 ```bash
 $ oc patch Central stackrox-central-services -n stackrox --type merge --patch '{"spec":{"central":{ "defaultTLSSecret":{"name":"acs-central-cert"}}}}'
 ```
+
+### Get Openshift Default Domain
+
+```bash
+$ oc get cluster cluster -o jsonpath='{.spec.domain}'
+```
