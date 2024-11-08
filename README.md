@@ -310,11 +310,11 @@ spec:
 ## Others 
 
 ### Get API TOKEN
-![Go to Integrations](./images/integrations.png)
+![Go to Integrations](./rhacs/images/integrations.png)
 
-![GO to API TOKEN](./images/apitoken.png)
+![GO to API TOKEN](./rhacs/images/apitoken.png)
 
-![Fill the form](./images/apitokenform.png)
+![Fill the form](./rhacs/images/apitokenform.png)
 
 ### Get ACS Endpoint
 ```bash
