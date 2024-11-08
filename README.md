@@ -3,7 +3,7 @@
 ## Goals
 The goal of this Helm charts is to provides Helm charts that will manage the deployment of ACS components into cluster.
 
-## ACS Compoments
+## RHACS Compoments
 To install ACS Operator, you need to install their components.
 
 - **Central**: [Centralized components] Central is the main component of Red Hat Advanced Cluster Security for Kubernetes and it is installed as a Kubernetes deployment. It handles data persistence, API interactions, and user interface (Portal) access. You can use the same Central instance to secure multiple OpenShift Container Platform or Kubernetes clusters.
@@ -16,11 +16,21 @@ To install ACS Operator, you need to install their components.
 
 - **Collector**: [1 x Node OCP/K8s Nodes] Collector collects and monitors information about container runtime and network activity. It then sends the collected information to Sensor.
 
-## ACS Architecture 
+## RHACS Architecture 
 
 The relationship between ACS Components can be found below :
 ![ACS Architecture](./rhacs/images/acsarchitecture.png)
 
+
+## RHACS Configuration:
+
+To deploy RH ACS we use the tools defined as the picture bellow : 
+![ACS Directory structure](./rhacs/images/acsconfiguration.png)
+
+## RHACS Deployment: 
+
+The Deployment of ACS is done with helm charts, we have defined three helm chart and deploy them on each cluster depending on their type.
+![ACS Directory structure](./rhacs/images/acsdeployment.png)
 
 ## RHACS Install with Helm Chart
 
@@ -36,7 +46,7 @@ The Helm charts to install ACS Operator are composed of the following components
 
 ### RHACS Helm charts
 
-#### [Helm chart acs-operator](./acs-operator/Chart.yaml) : 
+#### [Helm chart acs-operator](./rhacs/acs-operator/Chart.yaml) : 
 
 
 > [!NOTE]
@@ -85,7 +95,7 @@ This chart will create the following ressources:
     - Create the default Administratr password used to connect to RHACS in the project `stackrox`
 
 
-#### [Helm chart acs-central-services](./charts/acs-central-services/Chart.yaml/):
+#### [Helm chart acs-central-services]( ./rhacs/acs-operator/charts/acs-central-services/Chart.yaml/):
 
 > [!CAUTION]
 > This ressource should only be installed in the central cluster.
@@ -108,7 +118,7 @@ This chart will create the following ressources:
 - central-openshift-auth.yaml :
     - Create Declaration configuration for Openshift Auth used to connect to RHACS with the differents Roles.
 
-#### [Helm chart acs-secured-cluster](./charts/acs-secured-cluster/Chart.yaml/):
+#### [Helm chart acs-secured-cluster](./rhacs/acs-operator/charts/acs-secured-cluster/Chart.yaml/):
 
 > [!CAUTION]
 > This ressource should be installed on each cluster to be managed by ACS.
@@ -142,19 +152,174 @@ This chart will create the following ressources:
 - secured-cluster.yaml:
     - Create `SecuredCluster` resources named : `stackrox-secured-cluster-services`
 
+## Backup & Restore
+
+### PVC
+
+```yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: acs-backups
+  namespace: stackrox
+  annotations:
+    kubernetes.io/metadata.name: rhacs-central
+    argocd.argoproj.io/sync-wave: "7"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: managed-csi
+  volumeMode: Filesystem
+```
+### CronJobs:
+
+#### CronJobs acs-clean-backups :
+
+This CronJobs  will be launched 10min after the first Job who create backups.
+The role of this CronJobs is to delete the backups older than 30 days.
+
+```yaml
+kind: CronJob
+apiVersion: batch/v1
+metadata:
+  annotations:
+    kubernetes.io/metadata.name: rhacs-central
+    argocd.argoproj.io/sync-wave: "7"
+  name: acs-clean-backups
+  namespace: stackrox
+spec:
+  schedule: 10 1 * * *
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Allow
+  suspend: false
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+    spec:
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          serviceAccountName: acs-backups
+          serviceAccount: acs-backups
+          volumes:
+            - name: acs-backups
+              persistentVolumeClaim:
+                claimName: acs-backups
+          containers:
+            - name: clean-backups # Only delete the files older than 30 days ago.
+              image: registry.access.redhat.com/ubi8/ubi:8.10-1088
+              args:
+                - /bin/sh
+                - '-c'
+                - 'find /var/lib/acs/backups* -mtime +30 -exec rm {} \;'
+              volumeMounts:
+                - name: acs-backups
+                  mountPath: /var/lib/acs/backups 
+              imagePullPolicy: IfNotPresent
+          restartPolicy: OnFailure
+          terminationGracePeriodSeconds: 30
+```
+
+#### CronJobs acs-create-backups :
+
+This CronJobs will be be launched at 1am to create backups.
+
+```yaml
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  annotations:
+    kubernetes.io/metadata.name: rhacs-central
+    argocd.argoproj.io/sync-wave: "7"
+  name: acs-create-backups
+  namespace: stackrox
+spec:
+  schedule: 0 1 * * * # Every Day at 1am
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Allow
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+    spec:
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          serviceAccountName: acs-backups
+          serviceAccount: acs-backups
+          volumes:
+            - name: acs-backups
+              persistentVolumeClaim:
+                claimName: acs-backups
+          containers:
+            - name: create-backups
+              image: registry.access.redhat.com/ubi8/ubi:8.10-1088
+              env:
+                - name: PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: central-admin
+                      key: password
+              command:
+                  - /bin/bash
+                  - -c
+                  - |
+                      #!/usr/bin/env bash
+                      
+                      curl -s -k -L --user "admin:$PASSWORD" https://central:443/api/cli/download/roxctl-linux -o /tmp/roxctl
+                      if [ $? -eq 0 ]; then
+                          echo "Retrieve of roxctl command succeed"
+                      else
+                          echo "Retrieve of roxctl command failed"
+                          exit 1
+                      fi
+
+                      chmod +x /tmp/roxctl
+                      if [ $? -eq 0 ]; then
+                          echo "Change roxctl command rigths succeed"
+                      else
+                          echo "Change roxctl command rigths failed"
+                          exit 1
+                      fi
+
+                      /tmp/roxctl -p $PASSWORD central backup --endpoint=https://central:443 --insecure-skip-tls-verify  --output /var/lib/acs/backups 
+                      if [ $? -eq 0 ]; then
+                          echo "INFO: Backup of the central succeed"
+                      else
+                          echo "Error: Backup of the central failed"
+                          exit 1
+                      fi
+              imagePullPolicy: IfNotPresent
+              volumeMounts:
+                - mountPath: /var/lib/acs/backups 
+                  name: acs-backups
+          dnsPolicy: ClusterFirst
+          restartPolicy: OnFailure
+          terminationGracePeriodSeconds: 30
+  
+```
+
 ## Others 
 
 ### Get API TOKEN
-![Go to Integrations](./rhacs/images/integrations.png)
+![Go to Integrations](./images/integrations.png)
 
-![GO to API TOKEN](./rhacs/images/apitoken.png)
+![GO to API TOKEN](./images/apitoken.png)
 
-![Fill the form](./rhacs/images/apitokenform.png)
+![Fill the form](./images/apitokenform.png)
 
 ### Get ACS Endpoint
 ```bash
 #Example: central-stackrox.apps.cluster-6gpg5.6gpg5.sandbox2279.opentlc.com
-$ oc get route central -n stackrox --no-headers | awk '{print $2}'
+ oc get route central -n stackrox --no-headers | awk '{print $2}'
 ```
 
 ### Get RHACS certificate:
@@ -162,22 +327,21 @@ $ oc get route central -n stackrox --no-headers | awk '{print $2}'
 1. Get the name of the secret containing the openshift Ingress certificate :
 
 ```bash
-$ INGRESS_CERT=$(oc get ingresscontroller default -n openshift-ingress-operator -o jsonpath='{.spec.defaultCertificate.name}')
-
+INGRESS_CERT=$(oc get ingresscontroller default -n openshift-ingress-operator -o jsonpath='{.spec.defaultCertificate.name}')
 ```
 
 2. Create the secret into the `stackrox` namespace :
 ```bash
-$ oc delete secret acs-central-cert -n stackrox || oc get secret $INGRESS_CERT -n openshift-ingress -o yaml | yq 'del(.metadata.creationTimestamp, .metadata.annotations, .metadata.namespace, .metadata.uid, .metadata.resourceVersion, .metadata.labels)' | sed "s/$INGRESS_CERT/acs-central-cert/g" | oc create -n stackrox -f -
+oc delete secret acs-central-cert -n stackrox || oc get secret $INGRESS_CERT -n openshift-ingress -o yaml | yq 'del(.metadata.creationTimestamp, .metadata.annotations, .metadata.namespace, .metadata.uid, .metadata.resourceVersion, .metadata.labels)' | sed "s/$INGRESS_CERT/acs-central-cert/g" | oc create -n stackrox -f -
 ```
 
 3. Update Central resource:
 ```bash
-$ oc patch Central stackrox-central-services -n stackrox --type merge --patch '{"spec":{"central":{ "defaultTLSSecret":{"name":"acs-central-cert"}}}}'
+oc patch Central stackrox-central-services -n stackrox --type merge --patch '{"spec":{"central":{ "defaultTLSSecret":{"name":"acs-central-cert"}}}}'
 ```
 
 ### Get Openshift Default Domain
 
 ```bash
-$ oc get cluster cluster -o jsonpath='{.spec.domain}'
+oc get cluster cluster -o jsonpath='{.spec.domain}'
 ```
