@@ -3,6 +3,3 @@ oauth_provider:
     - key: groups
       value: Admin
       role: Admin
-    - key: email
-      value: job@red.com
-      role: Admin
