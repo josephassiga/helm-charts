@@ -1,3 +1,23 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: acs-backups
+  annotations:
+    kubernetes.io/metadata.name: rhacs-central
+    argocd.argoproj.io/sync-wave: "7"
+spec:
+  capacity:
+    storage: 50Gi
+  csi:
+    driver: ebs.csi.aws.com
+    fsType: ext4
+    volumeHandle: vol-acs-backups
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: gp3-csi
+  volumeMode: Filesystem
+---
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
@@ -13,3 +33,4 @@ spec:
     requests:
       storage: 50Gi
   volumeMode: Filesystem
+  volumeName:  acs-backups
