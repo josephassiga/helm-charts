@@ -1,3 +1,4 @@
+{{- if (ne .Values.operator.approvalPlan "Automatic") -}}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -54,3 +55,4 @@ spec:
       serviceAccount: acs-operator-installer
       serviceAccountName: acs-operator-installer
       terminationGracePeriodSeconds: 30
+{{- end -}}
