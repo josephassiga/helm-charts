@@ -3,6 +3,6 @@ cluster:
   clusterName: local-cluster
 
 central:
-  # put this value with https
+  # put this value without https
   endpoint: 'central-stackrox.apps.cluster-gsljf.gsljf.sandbox388.opentlc.com'
 

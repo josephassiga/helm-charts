@@ -12,3 +12,6 @@ components:
 acs-secured-cluster:
   cluster:
     clusterName: aro-mgmtlab
+  central:
+    # put this value without https
+    endpoint: 'central-stackrox.apps.cluster-gsljf.gsljf.sandbox388.opentlc.com'
