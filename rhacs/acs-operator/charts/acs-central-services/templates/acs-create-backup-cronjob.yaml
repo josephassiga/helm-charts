@@ -8,7 +8,6 @@ metadata:
   name: acs-create-backups
   namespace: stackrox
 spec:
-  serviceAccountName: acs-backups
   schedule: 0 1 * * * # Every Day at 1am
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 1
