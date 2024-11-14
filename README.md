@@ -343,5 +343,5 @@ oc patch Central stackrox-central-services -n stackrox --type merge --patch '{"s
 ### Get Openshift Default Domain
 
 ```bash
-oc get cluster cluster -o jsonpath='{.spec.domain}'
+oc get ingress.config.openshift.io cluster -o jsonpath='{.spec.domain}'
 ```
